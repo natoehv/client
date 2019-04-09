@@ -15,16 +15,12 @@ test('Client() - instantiate new client object - should have register method', (
     expect(client.register).toBeInstanceOf(Function);
 });
 
-test('Client() - object tag - should be PodiumClient', () => {
+test('Client() - object tag - should be PodletClient', () => {
     const client = new Client();
     expect(Object.prototype.toString.call(client)).toEqual(
-        '[object PodiumClient]',
+        '[object PodletClient]',
     );
 });
-
-
-
-
 
 /**
  * .on('dispose')

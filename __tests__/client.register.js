@@ -20,7 +20,7 @@ test('client.register() - call with no options - should throw', () => {
     const client = new Client();
     expect(() => {
         client.register();
-    }).toThrowError('The value, "undefined", for the required argument "name" on the .register() method is not defined or not valid.');
+    }).toThrowError('You must provide a value to "options.uri"');
 });
 
 test('client.register() - call with missing value for "options.uri" - should throw', () => {
@@ -28,7 +28,7 @@ test('client.register() - call with missing value for "options.uri" - should thr
 
     expect(() => {
         client.register({ name: 'example' });
-    }).toThrowError('The value, "undefined", for the required argument "uri" on the .register() method is not defined or not valid.');
+    }).toThrowError('You must provide a value to "options.uri"');
 });
 
 test('client.register() - call with a invalid value for "options.uri" - should throw', () => {
@@ -36,7 +36,7 @@ test('client.register() - call with a invalid value for "options.uri" - should t
 
     expect(() => {
         client.register({ uri: '/wrong', name: 'someName' });
-    }).toThrowError('The value, "undefined", for the required argument "uri" on the .register() method is not defined or not valid.');
+    }).toThrowError('The value for "options.uri", /wrong, is not a valid URI');
 });
 
 test('client.register() - call with a invalid value for "options.name" - should throw', () => {
@@ -45,7 +45,7 @@ test('client.register() - call with a invalid value for "options.name" - should 
     expect(() => {
         client.register({ uri: 'http://example-a.org', name: 'some name' });
     }).toThrowError(
-        'The value, "some name", for the required argument "name" on the .register() method is not defined or not valid.'
+        'The value for "options.name", some name, is not a valid name'
     );
 });
 
@@ -54,7 +54,7 @@ test('client.register() - call with missing value for "options.name" - should th
 
     expect(() => {
         client.register({ uri: 'http://example-a.org' });
-    }).toThrowError('The value, "undefined", for the required argument "name" on the .register() method is not defined or not valid.');
+    }).toThrowError('You must provide a value to "options.name"');
 });
 
 test('client.register() - call duplicate names - should throw', () => {

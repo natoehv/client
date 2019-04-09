@@ -4,13 +4,11 @@
 
 /* eslint no-unused-vars: "off" */
 
-const getStream = require('get-stream');
+const Resource = require('../lib/resource');
+const Faker = require('../test/faker');
 const stream = require('readable-stream');
 const Cache = require('ttl-mem-cache');
-
-const Resource = require('../lib/resource');
-const State = require('../lib/state');
-const Faker = require('../test/faker');
+const getStream = require('get-stream');
 const Client = require('../');
 
 // const REGISTRY = new Cache();
@@ -21,9 +19,9 @@ const URI = 'http://example.org';
  */
 
 test('Resource() - object tag - should be PodletClientResource', () => {
-    const resource = new Resource(new Cache(), new State(), { uri: URI });
+    const resource = new Resource(new Cache(), { uri: URI });
     expect(Object.prototype.toString.call(resource)).toEqual(
-        '[object PodiumClientResource]',
+        '[object PodletClientResource]',
     );
 });
 
@@ -32,17 +30,22 @@ test('Resource() - no "registry" - should throw', () => {
     expect(() => {
         const resource = new Resource();
     }).toThrowError(
-        'you must pass a "registry" object to the PodiumClientResource constructor',
+        'you must pass a "registry" object to the PodletClientResource constructor',
     );
 });
 
+test('Resource() - set "options.uri" - should set value on "this.options.uri"', () => {
+    const resource = new Resource(new Cache(), { uri: URI });
+    expect(resource.options.uri).toBe(URI);
+});
+
 test('Resource() - instantiate new resource object - should have "fetch" method', () => {
-    const resource = new Resource(new Cache(), new State(), { uri: URI });
+    const resource = new Resource(new Cache(), { uri: URI });
     expect(resource.fetch).toBeInstanceOf(Function);
 });
 
 test('Resource() - instantiate new resource object - should have "stream" method', () => {
-    const resource = new Resource(new Cache(), new State(), { uri: URI });
+    const resource = new Resource(new Cache(), { uri: URI });
     expect(resource.stream).toBeInstanceOf(Function);
 });
 
@@ -54,7 +57,7 @@ test('resource.fetch() - should return a promise', async () => {
     const server = new Faker({ version: '1.0.0' });
     const service = await server.listen();
 
-    const resource = new Resource(new Cache(), new State(), service.options);
+    const resource = new Resource(new Cache(), service.options);
     const fetch = resource.fetch({});
     expect(fetch).toBeInstanceOf(Promise);
 
@@ -75,7 +78,7 @@ test('resource.fetch(podiumContext) - should pass it on', async () => {
         );
     });
 
-    const resource = new Resource(new Cache(), new State(), service.options);
+    const resource = new Resource(new Cache(), service.options);
     await resource.fetch({
         'podium-locale': 'nb-NO',
         'podium-mount-origin': 'http://www.example.org',
@@ -91,7 +94,7 @@ test('resource.fetch() - returns an object with content, js and css keys', async
         assets: { js: 'http://fakejs.com', css: 'http://fakecss.com' },
     });
     const service = await server.listen();
-    const resource = new Resource(new Cache(), new State(), service.options);
+    const resource = new Resource(new Cache(), service.options);
 
     const result = await resource.fetch({});
 
@@ -110,7 +113,7 @@ test('resource.fetch() - returns empty strings for js and css when no assets are
     const server = new Faker();
     const service = await server.listen();
 
-    const resource = new Resource(new Cache(), new State(), service.options);
+    const resource = new Resource(new Cache(), service.options);
     const result = await resource.fetch({});
 
     expect(result).toEqual({
@@ -130,7 +133,7 @@ test('resource.stream() - should return a stream', async () => {
     const server = new Faker({ version: '1.0.0' });
     const service = await server.listen();
 
-    const resource = new Resource(new Cache(), new State(), service.options);
+    const resource = new Resource(new Cache(), service.options);
     const strm = resource.stream({});
     expect(strm).toBeInstanceOf(stream);
 
@@ -145,7 +148,7 @@ test('resource.stream() - should emit beforeStream event with no assets', async 
     const server = new Faker({ version: '1.0.0' });
     const service = await server.listen();
 
-    const resource = new Resource(new Cache(), new State(), service.options);
+    const resource = new Resource(new Cache(), service.options);
     const strm = resource.stream({});
     strm.once('beforeStream', ({ headers, js, css }) => {
         expect(headers['podlet-version']).toEqual('1.0.0');
@@ -164,7 +167,7 @@ test('resource.stream() - should emit js event when js assets defined', async ()
     const server = new Faker({ assets: { js: 'http://fakejs.com' } });
     const service = await server.listen();
 
-    const resource = new Resource(new Cache(), new State(), service.options);
+    const resource = new Resource(new Cache(), service.options);
     const strm = resource.stream({});
     strm.once('beforeStream', ({ js }) => {
         expect(js).toEqual('http://fakejs.com');
@@ -181,7 +184,7 @@ test('resource.stream() - should emit css event when css assets defined', async 
     const server = new Faker({ assets: { css: 'http://fakecss.com' } });
     const service = await server.listen();
 
-    const resource = new Resource(new Cache(), new State(), service.options);
+    const resource = new Resource(new Cache(), service.options);
     const strm = resource.stream({});
     strm.once('beforeStream', ({ css }) => {
         expect(css).toEqual('http://fakecss.com');
@@ -200,7 +203,7 @@ test('resource.stream() - should emit beforeStream event before emitting data', 
     });
     const service = await server.listen();
 
-    const resource = new Resource(new Cache(), new State(), service.options);
+    const resource = new Resource(new Cache(), service.options);
     const strm = resource.stream({});
     const items = [];
 
@@ -228,7 +231,7 @@ test('resource.refresh() - should return a promise', async () => {
     const server = new Faker({ version: '1.0.0' });
     const service = await server.listen();
 
-    const resource = new Resource(new Cache(), new State(), service.options);
+    const resource = new Resource(new Cache(), service.options);
     const refresh = resource.refresh();
     expect(refresh).toBeInstanceOf(Promise);
 
@@ -285,7 +288,7 @@ test('resource.refresh() - manifest with fallback is available - should get mani
  */
 
 test('Resource().uri - instantiate new resource object - expose own uri', () => {
-    const resource = new Resource(new Cache(), new State(), { uri: URI });
+    const resource = new Resource(new Cache(), { uri: URI });
     expect(resource.uri).toBe(URI);
 });
 
@@ -294,6 +297,6 @@ test('Resource().uri - instantiate new resource object - expose own uri', () => 
  */
 
 test('Resource().name - instantiate new resource object - expose own name', () => {
-    const resource = new Resource(new Cache(), new State(), { uri: URI, name: 'someName' });
+    const resource = new Resource(new Cache(), { uri: URI, name: 'someName' });
     expect(resource.name).toBe('someName');
 });

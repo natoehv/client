@@ -43,10 +43,6 @@ jobs:
 
     # Release Candidates
     -
-      node_js: '12'
-      if: type = cron
-      env: NVM_NODEJS_ORG_MIRROR=https://nodejs.org/download/rc/
-    -
       node_js: '11'
       if: type = cron
       env: NVM_NODEJS_ORG_MIRROR=https://nodejs.org/download/rc/
